@@ -50,10 +50,26 @@ const addBookHandler = (request, h) => {
 };
 
 const getAllBooksHandler = (request, h) => {
-  const books = bookshelf.map(({ id, name, publisher }) => ({
-    id,
-    name,
-    publisher,
+  const { name, reading, finished } = request.query;
+
+  let books = bookshelf;
+
+  if (name) {
+    books = books.filter((b) => b.name.match(new RegExp(name, 'i')));
+  }
+
+  if (reading) {
+    books = books.filter((b) => b.reading === !!+reading);
+  }
+
+  if (finished) {
+    books = books.filter((b) => b.finished === !!+finished);
+  }
+
+  books = books.map((b) => ({
+    id: b.id,
+    name: b.name,
+    publisher: b.publisher,
   }));
 
   return h.response({
